@@ -1,1 +1,63 @@
+{{- if .Values.route.enabled -}}
+{{- $fullName := include "base-package.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- range .Values.route.hosts }}
+{{- $host := .host }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "base-package.labels" $ | nindent 4 }}
+  {{- with $.Values.route.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  host: {{ $host | quote }}
+  to:
+    kind: Service
+    name: {{ $fullName }}
+    weight: 100
+  port:
+    targetPort: {{ $svcPort }}
+  {{- if $.Values.route.termination }}
+  tls:
+    termination: {{ $.Values.route.termination }}
+    insecureEdgeTerminationPolicy: Redirect
+  {{- end }}
+  {{- range .paths }}
+  path: {{ .path }}
+  {{- end }}
+{{- range .restrictedPaths }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ $fullName }}-limit-{{ .path | replace "/" "-" | trimPrefix "-" }}
+  labels:
+    {{- include "base-package.labels" $ | nindent 4 }}
+  annotations:
+    {{- with $.Values.route.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    # ГЛАВНОЕ: Ограничение по IP только для этого конкретного пути
+    haproxy.router.openshift.io/ip_whitelist: {{ .whitelist | quote }}
+spec:
+  host: {{ $host | quote }}
+  path: {{ .path }}
+  to:
+    kind: Service
+    name: {{ $fullName }}
+    weight: 100
+  port:
+    targetPort: {{ $svcPort }}
+  {{- if $.Values.route.termination }}
+  tls:
+    termination: {{ $.Values.route.termination }}
+    insecureEdgeTerminationPolicy: Redirect
+  {{- end }}
+{{- end }}
+{{- end }}
 
+{{- end }}
