@@ -1,5 +1,7 @@
 {{- if .Values.route.enabled -}}
 {{- $fullName := include "base-package.fullname" . -}}
+{{- $root := . -}}
+{{- $svcPort := .Values.service.port -}}
 {{- range .Values.route.hosts }}
 {{- $host := .host }}
 {{- range .paths }}
@@ -7,10 +9,10 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ $fullName }}-{{ .path | replace "/" "-" | trimPrefix "-" | default "root" }}
+  name: {{ printf "%s-%s" $fullName (.path | replace "/" "-" | trimPrefix "-" | default "root") | trunc 63 | trimSuffix "-" }}
   labels:
-    {{- include "base-package.labels" $ | nindent 4 }}
-  {{- with $.Values.route.annotations }}
+    {{- include "base-package.labels" $root | nindent 4 }}
+  {{- with $root.Values.route.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -21,24 +23,23 @@ spec:
     kind: Service
     name: {{ .serviceName | default $fullName }}
   port:
-    targetPort: {{ .port | default $.Values.service.port }}
-  {{- if $.Values.route.tls }}
+    targetPort: {{ .port | default $svcPort }}
+  {{- if $root.Values.route.tls }}
   tls:
-    termination: {{ $.Values.route.tls.termination | default "edge" }}
-    insecureEdgeTerminationPolicy: {{ $.Values.route.tls.insecureEdgeTerminationPolicy | default "Redirect" }}
+    termination: {{ $root.Values.route.tls.termination | default "edge" }}
+    insecureEdgeTerminationPolicy: {{ $root.Values.route.tls.insecureEdgeTerminationPolicy | default "Redirect" }}
   {{- end }}
 {{- end }}
-{{- if .restrictedPaths }}
 {{- range .restrictedPaths }}
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ $fullName }}-restricted-{{ .path | replace "/" "-" | trimPrefix "-" }}
+  name: {{ printf "%s-limit-%s" $fullName (.path | replace "/" "-" | trimPrefix "-" | default "root") | trunc 63 | trimSuffix "-" }}
   labels:
-    {{- include "base-package.labels" $ | nindent 4 }}
+    {{- include "base-package.labels" $root | nindent 4 }}
   annotations:
-    {{- with $.Values.route.annotations }}
+    {{- with $root.Values.route.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
     haproxy.router.openshift.io/ip_whitelist: {{ .whitelist | quote }}
@@ -49,13 +50,12 @@ spec:
     kind: Service
     name: {{ .serviceName | default $fullName }}
   port:
-    targetPort: {{ .port | default $.Values.service.port }}
-  {{- if $.Values.route.tls }}
+    targetPort: {{ .port | default $svcPort }}
+  {{- if $root.Values.route.tls }}
   tls:
-    termination: {{ $.Values.route.tls.termination | default "edge" }}
-    insecureEdgeTerminationPolicy: {{ $.Values.route.tls.insecureEdgeTerminationPolicy | default "Redirect" }}
+    termination: {{ $root.Values.route.tls.termination | default "edge" }}
+    insecureEdgeTerminationPolicy: {{ $root.Values.route.tls.insecureEdgeTerminationPolicy | default "Redirect" }}
   {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
