@@ -9,6 +9,6 @@ entries:
     name: base-package
     type: application
     urls:
-    - base-package-0.0.1.tgz
-    version: 0.0.1
+    - base-package-0.0.2.tgz
+    version: 0.0.2
 generated: "2024-02-20T00:17:56.655022+03:00"
