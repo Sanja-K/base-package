@@ -15,10 +15,10 @@ metadata:
   {{- end }}
 spec:
   host: {{ $host | quote }}
+  path: {{ (index .paths 0).path | default "/" }}
   to:
     kind: Service
     name: {{ $fullName }}
-    weight: 100
   port:
     targetPort: {{ $svcPort }}
   {{- if $.Values.route.termination }}
@@ -26,15 +26,13 @@ spec:
     termination: {{ $.Values.route.termination }}
     insecureEdgeTerminationPolicy: Redirect
   {{- end }}
-  {{- range .paths }}
-  path: {{ .path }}
-  {{- end }}
+{{- if .restrictedPaths }}
 {{- range .restrictedPaths }}
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ $fullName }}-limit-{{ .path | replace "/" "-" | trimPrefix "-" }}
+  name: {{ $fullName }}-restricted-{{ .path | replace "/" "-" | trimPrefix "-" }}
   labels:
     {{- include "base-package.labels" $ | nindent 4 }}
   annotations:
@@ -48,7 +46,6 @@ spec:
   to:
     kind: Service
     name: {{ $fullName }}
-    weight: 100
   port:
     targetPort: {{ $svcPort }}
   {{- if $.Values.route.termination }}
@@ -58,5 +55,5 @@ spec:
   {{- end }}
 {{- end }}
 {{- end }}
-
+{{- end }}
 {{- end }}
