@@ -1,12 +1,13 @@
 {{- if .Values.route.enabled -}}
 {{- $fullName := include "base-package.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
 {{- range .Values.route.hosts }}
 {{- $host := .host }}
+{{- range .paths }}
+---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-{{ .path | replace "/" "-" | trimPrefix "-" | default "root" }}
   labels:
     {{- include "base-package.labels" $ | nindent 4 }}
   {{- with $.Values.route.annotations }}
@@ -15,17 +16,18 @@ metadata:
   {{- end }}
 spec:
   host: {{ $host | quote }}
-  path: {{ (index .paths 0).path | default "/" }}
+  path: {{ .path }}
   to:
     kind: Service
-    name: {{ $fullName }}
+    name: {{ .serviceName | default $fullName }}
   port:
-    targetPort: {{ $svcPort }}
-  {{- if $.Values.route.termination }}
+    targetPort: {{ .port | default $.Values.service.port }}
+  {{- if $.Values.route.tls }}
   tls:
-    termination: {{ $.Values.route.termination }}
-    insecureEdgeTerminationPolicy: Redirect
+    termination: {{ $.Values.route.tls.termination | default "edge" }}
+    insecureEdgeTerminationPolicy: {{ $.Values.route.tls.insecureEdgeTerminationPolicy | default "Redirect" }}
   {{- end }}
+{{- end }}
 {{- if .restrictedPaths }}
 {{- range .restrictedPaths }}
 ---
@@ -45,13 +47,13 @@ spec:
   path: {{ .path }}
   to:
     kind: Service
-    name: {{ $fullName }}
+    name: {{ .serviceName | default $fullName }}
   port:
-    targetPort: {{ $svcPort }}
-  {{- if $.Values.route.termination }}
+    targetPort: {{ .port | default $.Values.service.port }}
+  {{- if $.Values.route.tls }}
   tls:
-    termination: {{ $.Values.route.termination }}
-    insecureEdgeTerminationPolicy: Redirect
+    termination: {{ $.Values.route.tls.termination | default "edge" }}
+    insecureEdgeTerminationPolicy: {{ $.Values.route.tls.insecureEdgeTerminationPolicy | default "Redirect" }}
   {{- end }}
 {{- end }}
 {{- end }}
