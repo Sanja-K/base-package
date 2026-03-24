@@ -75,6 +75,28 @@ ingress:
      hosts:
        - localhost.local
 
+
+route:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: "true"
+    haproxy.router.openshift.io/timeout: "240s"
+
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  
+  hosts:
+    - host: localhost.local
+      paths:
+        - path: /
+      restrictedPaths:
+        - path: /
+          whitelist: "192.168.1.0/24 10.0.0.0/8"
+
+
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
