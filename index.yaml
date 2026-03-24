@@ -3,6 +3,16 @@ entries:
   base-package:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2026-03-25T03:00:00.000000+03:00"
+    description: A Helm chart for Kubernetes
+    digest: 0b27b2f70173570eb8462227170f78a9577583b9f5264b2caa007b0573e088f7
+    name: base-package
+    type: application
+    urls:
+    - base-package-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2024-11-28T21:47:11.397988+03:00"
     description: A Helm chart for Kubernetes
     digest: f86b32c9a5afca4350f4de823ffed3321e521e38f4c5d025d71de386afd1a5ce
@@ -11,4 +21,4 @@ entries:
     urls:
     - base-package-0.0.1.tgz
     version: 0.0.1
-generated: "2024-11-28T21:47:11.396652+03:00"
+generated: "2026-03-25T03:00:00.000000+03:00"
