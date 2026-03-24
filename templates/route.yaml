@@ -41,7 +41,6 @@ metadata:
     {{- with $.Values.route.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-    # ГЛАВНОЕ: Ограничение по IP только для этого конкретного пути
     haproxy.router.openshift.io/ip_whitelist: {{ .whitelist | quote }}
 spec:
   host: {{ $host | quote }}
