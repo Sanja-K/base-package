@@ -24,11 +24,7 @@ spec:
     name: {{ .serviceName | default $fullName }}
   port:
     targetPort: {{ .port | default $svcPort }}
-  {{- if $root.Values.route.tls }}
-  tls:
-    termination: {{ $root.Values.route.tls.termination | default "edge" }}
-    insecureEdgeTerminationPolicy: {{ $root.Values.route.tls.insecureEdgeTerminationPolicy | default "Redirect" }}
-  {{- end }}
+  {{- include "base-package.routeTls" $root | nindent 2 }}
 {{- end }}
 {{- range .restrictedPaths }}
 ---
@@ -51,11 +47,7 @@ spec:
     name: {{ .serviceName | default $fullName }}
   port:
     targetPort: {{ .port | default $svcPort }}
-  {{- if $root.Values.route.tls }}
-  tls:
-    termination: {{ $root.Values.route.tls.termination | default "edge" }}
-    insecureEdgeTerminationPolicy: {{ $root.Values.route.tls.insecureEdgeTerminationPolicy | default "Redirect" }}
-  {{- end }}
+  {{- include "base-package.routeTls" $root | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}
