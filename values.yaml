@@ -83,16 +83,13 @@ route:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/tls-acme: "true"
     haproxy.router.openshift.io/timeout: "240s"
-  tls:
-    termination: edge
-    insecureEdgeTerminationPolicy: Redirect
   hosts:
     - host: localhost.local
       paths:
         - path: /
       restrictedPaths:
-        - path: /example
-          whitelist: "192.168.1.0/24 10.0.0.0/8"
+        - path: /api/v1/admin
+          whitelist: "192.168.1.0/24, 10.0.0.0/8"
 
 
 
