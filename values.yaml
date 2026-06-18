@@ -137,3 +137,14 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+pvc:
+  enabled: false
+  name: ""
+  storageClass: ""
+  accessMode: "ReadWriteMany"
+  size: "10Gi"
+
+podSecurityContext: {}
+volumes: []
+volumeMounts: []
