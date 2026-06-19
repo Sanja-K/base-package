@@ -5,7 +5,7 @@ entries:
     appVersion: 0.0.1
     created: "2026-06-19T04:02:39Z"
     description: A Helm chart for Kubernetes
-    digest: 4206666d3f92269c93e3a240fa5a80fe5faa37b7cc7e7022dffdd89f9aad54eb
+    digest: a3f8a3caed4569d2b2e5c4f1eceded2d9f4ebbfc5dfc5d52004bdfb988db30a9
     name: base-package
     type: application
     urls:
