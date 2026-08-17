@@ -1,0 +1,29 @@
+{{- if .Values.podmonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "base-package.fullname" . }}
+  labels:
+    {{- include "base-package.labels" . | nindent 4 }}
+    {{- with .Values.podmonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  podMetricsEndpoints:
+    - interval: {{ .Values.podmonitor.interval }}
+      path: {{ .Values.podmonitor.path }}
+      port: {{ .Values.podmonitor.port }}
+      relabelings:
+        - action: replace
+          targetLabel: service
+          replacement: {{ default (include "base-package.fullname" .) .Values.podmonitor.service | quote }}
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+        - sourceLabels: [__meta_kubernetes_pod_container_name]
+          targetLabel: container
+  selector:
+    matchLabels:
+      {{- include "base-package.selectorLabels" . | nindent 6 }}
+{{- end }}
